@@ -21,7 +21,6 @@ import fitnesse.testsystems.slim.SlimTestContext;
 import fitnesse.testsystems.slim.Table;
 import fitnesse.testsystems.slim.results.SlimExceptionResult;
 import fitnesse.testsystems.slim.results.SlimTestResult;
-
 import static fitnesse.testsystems.slim.tables.ComparatorUtil.approximatelyEqual;
 import static java.lang.Character.isLetterOrDigit;
 import static java.lang.Character.toUpperCase;
@@ -510,6 +509,14 @@ public abstract class SlimTable {
   }
 
   class Comparator {
+    private boolean isDoubleWithFraction(String replacedExpected) {
+      try {
+        return replacedExpected.contains(".") && Double.valueOf(replacedExpected) != null;
+      } catch (NumberFormatException nfe) {
+        return false;
+      }
+    }
+
     private final String expression;
     private final String actual;
     private final String expected;
@@ -529,12 +536,14 @@ public abstract class SlimTable {
     private String arg1Text;
 
     public Comparator(String actual, String expected) {
-      this.expression = replaceSymbols(expected);
-      this.actual = actual;
-      this.expected = expected;
+      this(replaceSymbols(expected), actual, expected);
     }
 
     public Comparator(String expression, String actual, String expected) {
+      if (isDoubleWithFraction(expected)) {
+        expected = "~= " + expected;
+        expression = "~= " + expression;
+      }
       this.expression = expression;
       this.actual = actual;
       this.expected = expected;

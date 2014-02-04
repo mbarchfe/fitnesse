@@ -106,6 +106,11 @@ public class ReturnedValueExpectationTest {
   public void approximatelyEquals() throws Exception {
     assertExpectationMessage("~= 3.0", "2.95", "pass(2.95~=3.0)");
     assertExpectationMessage("~= 3.0", "2.8", "fail(2.8~=3.0)");
+    // approximately Equals is default for numbers with fraction
+    assertExpectationMessage("3.0", "2.95", "pass(2.95~=3.0)");
+    assertExpectationMessage("3.00", "2.95", "fail(2.95~=3.00)");
+    // but not for integers
+    assertExpectationMessage("3", "2.9", "fail(a=2.9;e=3)");
   }
 
   @Test
